@@ -4,6 +4,9 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceConfiguration;
 import org.hibernate.jpa.HibernatePersistenceConfiguration;
 
+import java.awt.*;
+import java.util.Scanner;
+
 public class App {
     static void main(String[] args) {
 
@@ -18,9 +21,32 @@ public class App {
             .property("hibernate.highlight_sql","true")
             .managedClasses(Hotel.class, Room.class, Guest.class, Booking.class);
 
-        try(EntityManagerFactory emf = cfg.createEntityManagerFactory()) {}
+        try(EntityManagerFactory emf = cfg.createEntityManagerFactory()) {
+            BookingRepository booking = new BookingRepository(emf);
+            GuestRepository guest = new GuestRepository(emf);
+            Scanner scanner = new Scanner(System.in);
+        }
+    }
 
+    public void printBookings(BookingRepository booking){
+        //todo: call BookingRepository to get all bookings and print to console
+    }
 
+    public void printBookingsByGuest(BookingRepository booking){
+        //todo: call BookingRepository to get all bookings connected to guest email and print to console
+    }
 
+    public void printGuestsByBooking(BookingRepository booking){
+        //todo: call BookingRepository to get all guests connected to booking and print to console
+    }
+
+    public void createBooking(BookingRepository booking){
+        //todo: enter guest and booking information
+        //todo: check for available rooms and choose room(s)
+        //todo: create booking through BookingRepository
+    }
+
+    public void removeBooking(BookingRepository booking){
+        //todo: call BookingRepository to remove a booking
     }
 }
