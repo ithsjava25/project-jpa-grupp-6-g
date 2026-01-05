@@ -1,6 +1,9 @@
 package org.example;
 
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.TypedQuery;
 
 public class GuestRepository {
     private EntityManagerFactory emf;
@@ -9,8 +12,21 @@ public class GuestRepository {
         this.emf = emf;
     }
 
-    public void get(String email){
-        //todo: find guest in Guest table based on email
+    // Find guest in Guest table based on email
+    public Guest get(String email) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            TypedQuery<Guest> query = em.createQuery(
+                "select g from Guest g where g.email = :email",
+                Guest.class
+            );
+           query.setParameter("email", email);
+           return query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        } finally {
+            em.close();
+        }
     }
 
     public void create(String firstName, String lastName, String email) {
