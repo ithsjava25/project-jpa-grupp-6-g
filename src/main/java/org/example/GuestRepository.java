@@ -48,7 +48,13 @@ public class GuestRepository {
             em.getTransaction().commit();
             System.out.println("Guest created!");
             System.out.println(firstName + " " + lastName + ", " + email);
-        }  finally {
+        } catch (Exception e ) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            System.out.println("Error creating guest: " + e.getMessage());
+
+        } finally {
             em.close();
         }
     }
