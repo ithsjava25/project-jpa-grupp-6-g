@@ -32,7 +32,7 @@ public class GuestRepository {
     // Create a new Guest in Guest table
     public void create(String firstName, String lastName, String email) {
         if (!validateGuest(email)){
-            System.out.println("Guest with email " + email + "already exists!");
+            System.out.println("Guest with email " + email + " already exists!");
             return;
         }
 
@@ -59,10 +59,9 @@ public class GuestRepository {
         }
     }
 
-    //todo: return true if guest doesn't exist in database
+    // Return true if guest doesn't exist in database
     public boolean validateGuest(String email){
-        //todo: validate here if get returns no results
-
-        return false;
+        Guest existingGuest = get(email);
+        return existingGuest == null;
     }
 }
