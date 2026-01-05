@@ -25,6 +25,8 @@ public class App {
             BookingRepository booking = new BookingRepository(emf);
             GuestRepository guest = new GuestRepository(emf);
             Scanner scanner = new Scanner(System.in);
+
+            booking.getEmptyRooms("2025-01-25", "2025-01-26", "2");
         }
     }
 
