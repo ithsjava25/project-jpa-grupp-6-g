@@ -29,9 +29,27 @@ public class GuestRepository {
         }
     }
 
+    // Create a new Guest in Guest table
     public void create(String firstName, String lastName, String email) {
-        if (validateGuest(email)){
-            //todo: add new row to Guest table
+        if (!validateGuest(email)){
+            System.out.println("Guest with email " + email + "already exists!");
+            return;
+        }
+
+        Guest guest = new Guest();
+        guest.setFirstName(firstName);
+        guest.setLastName(lastName);
+        guest.setEmail(email);
+
+        EntityManager em = emf.createEntityManager();
+        try {
+            em.getTransaction().begin();
+            em.persist(guest);
+            em.getTransaction().commit();
+            System.out.println("Guest created!");
+            System.out.println(firstName + " " + lastName + ", " + email);
+        }  finally {
+            em.close();
         }
     }
 
