@@ -32,7 +32,6 @@ public class GuestRepository {
     // Create a new Guest in Guest table
     public void create(String firstName, String lastName, String email) {
         if (!validateGuest(email)){
-            System.out.println("Guest with email " + email + " already exists!");
             return;
         }
 
@@ -46,13 +45,12 @@ public class GuestRepository {
             em.getTransaction().begin();
             em.persist(guest);
             em.getTransaction().commit();
-            System.out.println("Guest created!");
-            System.out.println(firstName + " " + lastName + ", " + email);
+
         } catch (Exception e ) {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
-            System.out.println("Error creating guest: " + e.getMessage());
+            throw e;
 
         } finally {
             em.close();
