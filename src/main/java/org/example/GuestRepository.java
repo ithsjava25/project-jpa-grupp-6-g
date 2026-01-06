@@ -31,7 +31,7 @@ public class GuestRepository {
 
     // Create a new Guest in Guest table
     public void create(String firstName, String lastName, String email) {
-        if (!validateGuest(email)){
+        if (!guestDoesNotExist(email)){
             return;
         }
 
@@ -58,7 +58,7 @@ public class GuestRepository {
     }
 
     // Return true if guest doesn't exist in database
-    public boolean validateGuest(String email){
+    public boolean guestDoesNotExist(String email){
         Guest existingGuest = get(email);
         return existingGuest == null;
     }
