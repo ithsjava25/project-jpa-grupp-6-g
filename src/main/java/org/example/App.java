@@ -26,7 +26,10 @@ public class App {
             GuestRepository guest = new GuestRepository(emf);
             Scanner scanner = new Scanner(System.in);
 
-            booking.getEmptyRooms("2025-01-25", "2025-01-26", "2");
+            booking.getEmptyRooms("2025-01-20", "2025-01-23", "2");
+            //booking.getBookings().forEach(System.out::println);
+            //booking.getGuestsByBooking("1");
+            //booking.getBookingsByGuest("anna.svensson@example.se");
         }
     }
 

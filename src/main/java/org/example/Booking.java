@@ -26,8 +26,8 @@ public class Booking {
     @ManyToMany(cascade = CascadeType.PERSIST)
     @JoinTable(
         name="guestBooking",
-        joinColumns = @JoinColumn(name="guest_id"),
-        inverseJoinColumns = @JoinColumn(name = "booking_id")
+        joinColumns = @JoinColumn(name="booking_id"),
+        inverseJoinColumns = @JoinColumn(name = "guest_id")
     )
     Set<Guest> guestBookings;
 

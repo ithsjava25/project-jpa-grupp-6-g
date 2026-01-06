@@ -62,5 +62,10 @@ public class Room {
     public void setPriceClass(BigDecimal priceClass) {
         this.priceClass = priceClass;
     }
+
+    @Override
+    public String toString() {
+        return "roomNumber = " + roomNumber;
+    }
 }
 
