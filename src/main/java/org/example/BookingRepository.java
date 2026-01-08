@@ -55,7 +55,7 @@ public class BookingRepository {
 //                availableRooms = query.getResultList();
 //                availableRooms.forEach(System.out::println);
 //        });
-//        return availableRooms.getFirst();
+//        return availableRooms.availableRooms.isEmpty() ? null: availableRooms.getFirst();
 //    }
 
     public List<BookingInfo> getBookings(){
@@ -130,15 +130,19 @@ public class BookingRepository {
 
             em.persist(booking);
 
-            Query query = em.createQuery("select b.id from Booking b order by id desc limit 1", Booking.class);
-            List<Booking> result = query.getResultList();
-            long bookingId = result.getFirst().getId();
+            Query query = em.createQuery("select max(b.id) from Booking b");
+            Long bookingId = (Long) query.getSingleResult();
+
+//            Query query = em.createQuery("select b.id from Booking b order by id desc limit 1", Booking.class);
+//            List<Booking> result = query.getResultList();
+//            long bookingId = result.getFirst().getId();
 
             for (String email : emailList)
                 em.createNativeQuery("insert into guestBooking (guest_id, booking_id) values (?, ?)")
 //                    .setParameter(1, GuestRepository.get(email).getId())
                     .setParameter(1, 1) // placeholder until GuestRepository.get() implemented
-                    .setParameter(2, bookingId);
+                    .setParameter(2, bookingId)
+                    .executeUpdate();
             status.set(true);
         });
         return status.get();
