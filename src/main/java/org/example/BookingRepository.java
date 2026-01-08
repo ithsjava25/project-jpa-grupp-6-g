@@ -3,18 +3,17 @@ package org.example;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Query;
 
-import java.text.SimpleDateFormat;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class BookingRepository {
     private final EntityManagerFactory emf;
-    private List<BookingInfo> bookingInfo;
-    private List<GuestInfo> guestInfo;
+    private final GuestRepository guestRepository;
 
-    public BookingRepository(EntityManagerFactory emf) {
+    public BookingRepository(EntityManagerFactory emf, GuestRepository guest) {
         this.emf = emf;
+        guestRepository = guest;
     }
 
     public List<Room> getEmptyRooms(LocalDate start, LocalDate end, long guests) {
@@ -39,143 +38,110 @@ public class BookingRepository {
         );
     }
 
-//    public Room getEmptyRooms(String startDate, String endDate, String guests){
-//        //todo: return a list of all available rooms from DB
-//        emf.runInTransaction(em -> {
-//                Query query = em.createNativeQuery(
-//                    "select r.* from Room r left join Booking b on r.id = b.room_id " +
-//                        "where (b.id is null) or " +
-//                        "(? not between b.startDate and date_add(b.endDate, interval -1 day) " +
-//                        "and ? not between date_add(b.startDate, interval 1 day) and b.endDate " +
-//                        "and r.roomCapacity >= ?)",
-//                        Room.class)
-//                    .setParameter(1, startDate)
-//                    .setParameter(2, endDate)
-//                    .setParameter(3, guests);
-//                availableRooms = query.getResultList();
-//                availableRooms.forEach(System.out::println);
-//        });
-//        return availableRooms.availableRooms.isEmpty() ? null: availableRooms.getFirst();
-//    }
-
     public List<BookingInfo> getBookings(){
-        emf.runInTransaction(em -> {
-            Query query = em.createQuery("select b from Booking b");
-            List<Booking> bookings = query.getResultList();
-            bookingInfo = bookings.stream()
+        return emf.callInTransaction(em -> {
+            //noinspection unchecked
+            List<Booking> bookings = em.createNativeQuery("select b.* from Booking b", Booking.class).getResultList();
+            return bookings.stream()
                 .map(booking -> {
                     return new BookingInfo(
                         booking.getId(),
                         booking.getBookedRoom().getRoomNumber(),
                         booking.getStartDate(),
-                        booking.getEndDate());})
+                        booking.getEndDate(),
+                        booking.getTotalPrice());})
                 .toList();
         });
-        return bookingInfo;
-        //todo: return all bookings form DB
     }
 
-    public List<GuestInfo> getGuestsByBooking(String bookingId){
-        emf.runInTransaction(em -> {
-            Query query = em.createNativeQuery(
-                "select * from Guest g " +
-                "join guestBooking gb " +
-                    "on g.id = gb.guest_id " +
-                "where gb.booking_id = :bookingId",
-                Guest.class);
-            query.setParameter("bookingId", bookingId);
-            List<Guest> guests = query.getResultList();
-            guestInfo = guests.stream().map(guest -> {
+    private List<Guest> getGuestsByBooking(String bookingId){
+        return emf.callInTransaction(em ->
+            em.createNativeQuery("""
+                select * from Guest g
+                join guestBooking gb on g.id = gb.guest_id
+                where gb.booking_id = :bookingId
+                """,
+                Guest.class).setParameter("bookingId", bookingId)
+                .getResultList()
+        );
+    }
+
+    public List<GuestInfo> getGuestInfoByBooking(String bookingId){
+        return getGuestsByBooking(bookingId).stream()
+            .map(guest -> {
                 return new GuestInfo(
                     guest.getEmail(),
                     guest.getFirstName(),
                     guest.getLastName());})
-                .toList();
-        });
-        return guestInfo;
-        //todo: return all guests connected to booking_id
+            .toList();
     }
 
-    public List<BookingInfo> getBookingsByGuest(String email){
-//        long guestId = GuestRepository.get(email).getId();
-        long guestId = 1; // placeholder until GuestRepository.get() implemented
-        emf.runInTransaction(em -> {
-            Query query = em.createNativeQuery(
-                "select * from Booking b " +
-                "join guestBooking gb " +
-                    "on b.id = gb.booking_id " +
-                "where gb.guest_id = :guestId",
-                Booking.class);
-            query.setParameter("guestId", guestId);
-            List<Booking> bookings = query.getResultList();
-            bookingInfo = bookings.stream()
+    public List<BookingInfo> getBookingInfoByGuest(String email){
+        long guestId = guestRepository.get(email).getId();
+        return emf.callInTransaction(em -> {
+            //noinspection unchecked
+            List<Booking> bookings = em.createNativeQuery("""
+                select * from Booking b
+                join guestBooking gb
+                on b.id = gb.booking_id
+                where gb.guest_id = :guestId
+                """, Booking.class)
+                .setParameter("guestId", guestId)
+                .getResultList();
+            return bookings.stream()
                 .map(booking -> {
                     return new BookingInfo(
                         booking.getId(),
                         booking.getBookedRoom().getRoomNumber(),
                         booking.getStartDate(),
-                        booking.getEndDate());})
+                        booking.getEndDate(),
+                        booking.getTotalPrice());})
                 .toList();
-            bookingInfo.forEach(System.out::println);
         });
-        //todo: return all bookings connected to email
-        return bookingInfo;
     }
 
-    public boolean create(List<String> emailList, String startDate, String endDate, String guests){
-        AtomicBoolean status = new AtomicBoolean(false);
-        emf.runInTransaction(em -> {
-            Room room = getEmptyRooms(LocalDate.parse(startDate), LocalDate.parse(endDate), Long.parseLong(guests)).getFirst();
-            Booking booking = createBooking(startDate, endDate, room);
+    public boolean create(List<String> emailList, LocalDate startDate, LocalDate endDate, long numberOfGuests, BigDecimal totalPrice){
+        return emf.callInTransaction(em -> {
+            Room room = getEmptyRooms(startDate, endDate, numberOfGuests).getFirst();
+
+            Booking booking = new Booking();
+            booking.setStartDate(startDate);
+            booking.setEndDate(endDate);
+            booking.setTotalPrice(totalPrice);
+            booking.setBookedRoom(room);
 
             em.persist(booking);
 
             Query query = em.createQuery("select max(b.id) from Booking b");
             Long bookingId = (Long) query.getSingleResult();
 
-//            Query query = em.createQuery("select b.id from Booking b order by id desc limit 1", Booking.class);
-//            List<Booking> result = query.getResultList();
-//            long bookingId = result.getFirst().getId();
-
             for (String email : emailList)
                 em.createNativeQuery("insert into guestBooking (guest_id, booking_id) values (?, ?)")
-//                    .setParameter(1, GuestRepository.get(email).getId())
-                    .setParameter(1, 1) // placeholder until GuestRepository.get() implemented
+                    .setParameter(1, guestRepository.get(email).getId())
                     .setParameter(2, bookingId)
                     .executeUpdate();
-            status.set(true);
+
+            return true;
         });
-        return status.get();
     }
 
-    private static Booking createBooking(String startDate, String endDate, Room room) {
-        LocalDate startingDate;
-        LocalDate endingDate;
+    public boolean remove(String bookingId){
+        return emf.callInTransaction(em -> {
+            var guests = getGuestsByBooking(bookingId);
 
-        startingDate = LocalDate.parse(startDate);
-        endingDate = LocalDate.parse(endDate);
+            for (Guest guest : guests)
+                em.createNativeQuery("delete gb.* from guestBooking gb where booking_id = ?")
+                    .setParameter(1, bookingId)
+                    .executeUpdate();
 
-
-        Booking booking = new Booking();
-        booking.setStartDate(startingDate);
-        booking.setEndDate(endingDate);
-        booking.setBookedRoom(room);
-        return booking;
-    }
-
-    public boolean remove(long bookingId){
-        AtomicBoolean status = new AtomicBoolean(false);
-        emf.runInTransaction(em -> {
             em.createNativeQuery("delete b.* from Booking b where id = ?")
                 .setParameter(1, bookingId)
                 .executeUpdate();
-            status.set(true);
+            return true;
         });
-        return status.get();
-        //todo: remove a booking from the Booking table
     }
 
-    record BookingInfo(long id, String roomNumber, LocalDate startDate, LocalDate endDate){}
+    record BookingInfo(long id, String roomNumber, LocalDate startDate, LocalDate endDate, BigDecimal totalPrice){ }
 
     record GuestInfo(String email, String firstName, String lastName){}
 }

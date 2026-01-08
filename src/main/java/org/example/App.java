@@ -5,7 +5,6 @@ import jakarta.persistence.PersistenceConfiguration;
 import org.hibernate.jpa.HibernatePersistenceConfiguration;
 
 import java.awt.*;
-import java.time.LocalDate;
 import java.util.Scanner;
 
 public class App {
@@ -23,18 +22,10 @@ public class App {
             .managedClasses(Hotel.class, Room.class, Guest.class, Booking.class);
 
         try(EntityManagerFactory emf = cfg.createEntityManagerFactory()) {
-            BookingRepository booking = new BookingRepository(emf);
             GuestRepository guest = new GuestRepository(emf);
+            BookingRepository booking = new BookingRepository(emf, guest);
             Scanner scanner = new Scanner(System.in);
 
-            booking.getEmptyRooms(LocalDate.of(2026, 1, 20),
-                LocalDate.of(2026, 1, 23 ),2)
-                .forEach(System.out::println);
-            // booking.remove(5);
-            //booking.getEmptyRooms("2026-01-20", "2026-01-23", "2");
-            //booking.getBookings().forEach(System.out::println);
-            //booking.getGuestsByBooking("1");
-            //booking.getBookingsByGuest("anna.svensson@example.se");
         }
     }
 

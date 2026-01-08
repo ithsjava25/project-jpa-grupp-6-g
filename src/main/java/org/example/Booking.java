@@ -2,6 +2,7 @@ package org.example;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Set;
 
@@ -23,6 +24,8 @@ public class Booking {
     //todo: not null, needs to be start date +1 or more
     private LocalDate endDate;
 
+    private BigDecimal totalPrice;
+
     @ManyToMany(cascade = CascadeType.PERSIST)
     @JoinTable(
         name="guestBooking",
@@ -32,8 +35,6 @@ public class Booking {
     Set<Guest> guestBookings;
 
     //todo: calculate total price by base price * guests * nightsSpent (weekday/end) (Adult/Child)
-    //todo: get base price and room capacity from room table.
-    public void calculateTotalPrice(){}
 
     public long getId() {
         return id;
@@ -55,8 +56,17 @@ public class Booking {
         return endDate;
     }
 
+
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
+    }
+
+    public BigDecimal getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(BigDecimal totalPrice) {
+        this.totalPrice = totalPrice;
     }
 
     public Set<Guest> getGuestBookings() {
