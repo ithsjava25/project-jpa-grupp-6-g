@@ -127,12 +127,10 @@ public class BookingRepository {
 
     public boolean remove(String bookingId){
         return emf.callInTransaction(em -> {
-            var guests = getGuestsByBooking(bookingId);
 
-            for (Guest guest : guests)
-                em.createNativeQuery("delete gb.* from guestBooking gb where booking_id = ?")
-                    .setParameter(1, bookingId)
-                    .executeUpdate();
+            em.createNativeQuery("delete gb.* from guestBooking gb where booking_id = ?")
+                .setParameter(1, bookingId)
+                .executeUpdate();
 
             em.createNativeQuery("delete b.* from Booking b where id = ?")
                 .setParameter(1, bookingId)
