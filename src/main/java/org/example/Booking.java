@@ -2,7 +2,8 @@ package org.example;
 
 import jakarta.persistence.*;
 
-import java.util.Date;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Set;
 
 @Entity
@@ -18,22 +19,22 @@ public class Booking {
     private Room bookedRoom;
 
     //todo: not null, needs to be in future
-    private Date startDate;
+    private LocalDate startDate;
 
     //todo: not null, needs to be start date +1 or more
-    private Date endDate;
+    private LocalDate endDate;
+
+    private BigDecimal totalPrice;
 
     @ManyToMany(cascade = CascadeType.PERSIST)
     @JoinTable(
         name="guestBooking",
-        joinColumns = @JoinColumn(name="guest_id"),
-        inverseJoinColumns = @JoinColumn(name = "booking_id")
+        joinColumns = @JoinColumn(name="booking_id"),
+        inverseJoinColumns = @JoinColumn(name = "guest_id")
     )
     Set<Guest> guestBookings;
 
-    //todo: calculate total price by base price * capacity * nightsSpent (weekday/end) (Adult/Child)
-    //todo: get base price and room capacity from room table.
-    public void calculateTotalPrice(){}
+    //todo: calculate total price by base price * guests * nightsSpent (weekday/end) (Adult/Child)
 
     public long getId() {
         return id;
@@ -43,20 +44,29 @@ public class Booking {
         this.id = id;
     }
 
-    public Date getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
+    }
+
+    public BigDecimal getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(BigDecimal totalPrice) {
+        this.totalPrice = totalPrice;
     }
 
     public Set<Guest> getGuestBookings() {

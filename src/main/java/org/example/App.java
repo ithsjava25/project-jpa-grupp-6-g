@@ -22,9 +22,10 @@ public class App {
             .managedClasses(Hotel.class, Room.class, Guest.class, Booking.class);
 
         try(EntityManagerFactory emf = cfg.createEntityManagerFactory()) {
-            BookingRepository booking = new BookingRepository(emf);
             GuestRepository guest = new GuestRepository(emf);
+            BookingRepository booking = new BookingRepository(emf, guest);
             Scanner scanner = new Scanner(System.in);
+
         }
     }
 
