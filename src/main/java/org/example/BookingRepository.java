@@ -3,9 +3,8 @@ package org.example;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Query;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -13,31 +12,51 @@ public class BookingRepository {
     private final EntityManagerFactory emf;
     private List<BookingInfo> bookingInfo;
     private List<GuestInfo> guestInfo;
-    private List<Room> availableRooms;
-
 
     public BookingRepository(EntityManagerFactory emf) {
         this.emf = emf;
     }
 
-    public Room getEmptyRooms(String startDate, String endDate, String guests){
-        //todo: return a list of all available rooms from DB
-        emf.runInTransaction(em -> {
-                Query query = em.createNativeQuery(
-                    "select r.* from Room r left join Booking b on r.id = b.room_id " +
-                        "where (b.id is null) or " +
-                        "(? not between b.startDate and date_add(b.endDate, interval -1 day) " +
-                        "and ? not between date_add(b.startDate, interval 1 day) and b.endDate " +
-                        "and r.roomCapacity >= ?)",
-                        Room.class)
-                    .setParameter(1, startDate)
-                    .setParameter(2, endDate)
-                    .setParameter(3, guests);
-                availableRooms = query.getResultList();
-                availableRooms.forEach(System.out::println);
-        });
-        return availableRooms.getFirst();
+    public List<Room> getEmptyRooms(LocalDate start, LocalDate end, long guests) {
+        return emf.callInTransaction(em ->
+            em.createQuery("""
+            select r
+            from Room r
+            where r.roomCapacity >= :guests
+              and not exists (
+                  select 1
+                  from Booking b
+                  where b.bookedRoom = r
+                    and b.startDate <= :end
+                    and b.endDate >= :start
+              )
+            order by r.id
+            """, Room.class)
+                .setParameter("start", start)
+                .setParameter("end", end)
+                .setParameter("guests", guests)
+                .getResultList()
+        );
     }
+
+//    public Room getEmptyRooms(String startDate, String endDate, String guests){
+//        //todo: return a list of all available rooms from DB
+//        emf.runInTransaction(em -> {
+//                Query query = em.createNativeQuery(
+//                    "select r.* from Room r left join Booking b on r.id = b.room_id " +
+//                        "where (b.id is null) or " +
+//                        "(? not between b.startDate and date_add(b.endDate, interval -1 day) " +
+//                        "and ? not between date_add(b.startDate, interval 1 day) and b.endDate " +
+//                        "and r.roomCapacity >= ?)",
+//                        Room.class)
+//                    .setParameter(1, startDate)
+//                    .setParameter(2, endDate)
+//                    .setParameter(3, guests);
+//                availableRooms = query.getResultList();
+//                availableRooms.forEach(System.out::println);
+//        });
+//        return availableRooms.getFirst();
+//    }
 
     public List<BookingInfo> getBookings(){
         emf.runInTransaction(em -> {
@@ -106,7 +125,7 @@ public class BookingRepository {
     public boolean create(List<String> emailList, String startDate, String endDate, String guests){
         AtomicBoolean status = new AtomicBoolean(false);
         emf.runInTransaction(em -> {
-            Room room = getEmptyRooms(startDate, endDate, guests);
+            Room room = getEmptyRooms(LocalDate.parse(startDate), LocalDate.parse(endDate), Long.parseLong(guests)).getFirst();
             Booking booking = createBooking(startDate, endDate, room);
 
             em.persist(booking);
@@ -126,16 +145,11 @@ public class BookingRepository {
     }
 
     private static Booking createBooking(String startDate, String endDate, Room room) {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        Date startingDate;
-        Date endingDate;
+        LocalDate startingDate;
+        LocalDate endingDate;
 
-        try {
-            startingDate = formatter.parse(startDate);
-            endingDate = formatter.parse(endDate);
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
+        startingDate = LocalDate.parse(startDate);
+        endingDate = LocalDate.parse(endDate);
 
 
         Booking booking = new Booking();
@@ -145,10 +159,10 @@ public class BookingRepository {
         return booking;
     }
 
-    public boolean remove(String bookingId){
+    public boolean remove(long bookingId){
         AtomicBoolean status = new AtomicBoolean(false);
         emf.runInTransaction(em -> {
-            em.createQuery("delete b from Booking b where id = ?")
+            em.createNativeQuery("delete b.* from Booking b where id = ?")
                 .setParameter(1, bookingId)
                 .executeUpdate();
             status.set(true);
@@ -157,7 +171,7 @@ public class BookingRepository {
         //todo: remove a booking from the Booking table
     }
 
-    record BookingInfo(long id, String roomNumber, Date startDate, Date endDate){}
+    record BookingInfo(long id, String roomNumber, LocalDate startDate, LocalDate endDate){}
 
     record GuestInfo(String email, String firstName, String lastName){}
 }

@@ -2,7 +2,7 @@ package org.example;
 
 import jakarta.persistence.*;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Set;
 
 @Entity
@@ -18,10 +18,10 @@ public class Booking {
     private Room bookedRoom;
 
     //todo: not null, needs to be in future
-    private Date startDate;
+    private LocalDate startDate;
 
     //todo: not null, needs to be start date +1 or more
-    private Date endDate;
+    private LocalDate endDate;
 
     @ManyToMany(cascade = CascadeType.PERSIST)
     @JoinTable(
@@ -43,19 +43,19 @@ public class Booking {
         this.id = id;
     }
 
-    public Date getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
 

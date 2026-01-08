@@ -54,18 +54,31 @@ values
     (6, 3),
     (7,4);
 
-select roomNumber from Room r
+select r.* from Room r
 join Booking b on r.id = b.room_id
-where '2026-01-25' not between b.startDate and date_add(b.endDate, interval -1 day) and '2026-01-26' not between date_add(b.startDate, interval 1 day) and b.endDate;
+where '2026-01-25' not between b.startDate and date_add(b.endDate, interval -1 day)
+  and '2026-01-26' not between date_add(b.startDate, interval 1 day) and b.endDate;
 
 select roomNumber from Room r
 left join Booking b on r.id = b.room_id
 order by r.id;
 
-select r.roomNumber
+select r.*
 from Room r
          left join Booking b on r.id = b.room_id
 where (b.id is null)
    or ('2026-01-20' not between b.startDate and DATE_ADD(b.endDate, interval -1 day)
     and '2026-01-23' not between DATE_ADD(b.startDate, interval 1 day) and b.endDate)
 order by r.id;
+
+
+select r.* from Room r left join Booking b on r.id = b.room_id
+    where (b.id is null) or
+    ('2026-01-20' not between b.startDate and date_add(b.endDate, interval -1 day)
+    and '2026-01-23' not between date_add(b.startDate, interval 1 day) and b.endDate
+    and r.roomCapacity >= 2);
+
+insert into Booking (startDate, endDate, room_id)
+values ('2026-01-27', '2026-01-30', 4);
+
+select * from Booking;
