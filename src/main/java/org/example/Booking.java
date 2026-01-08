@@ -31,7 +31,7 @@ public class Booking {
     )
     Set<Guest> guestBookings;
 
-    //todo: calculate total price by base price * capacity * nightsSpent (weekday/end) (Adult/Child)
+    //todo: calculate total price by base price * guests * nightsSpent (weekday/end) (Adult/Child)
     //todo: get base price and room capacity from room table.
     public void calculateTotalPrice(){}
 
