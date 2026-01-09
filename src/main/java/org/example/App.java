@@ -4,8 +4,6 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceConfiguration;
 import org.hibernate.jpa.HibernatePersistenceConfiguration;
 
-import java.awt.*;
-import java.util.Scanner;
 
 public class App {
     static void main(String[] args) {
