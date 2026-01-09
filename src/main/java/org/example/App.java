@@ -5,6 +5,9 @@ import jakarta.persistence.PersistenceConfiguration;
 import org.hibernate.jpa.HibernatePersistenceConfiguration;
 
 import java.awt.*;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Locale;
 import java.util.Scanner;
 
 public class App {
@@ -24,7 +27,8 @@ public class App {
         try(EntityManagerFactory emf = cfg.createEntityManagerFactory()) {
             GuestRepository guest = new GuestRepository(emf);
             BookingRepository booking = new BookingRepository(emf, guest);
-            Scanner scanner = new Scanner(System.in);
+            BookingService bookingService = new BookingService(emf, guest);
+
 
         }
     }
