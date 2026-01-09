@@ -78,9 +78,9 @@ public class Menu {
 
     public void printGuestsByBooking(){
         System.out.print("Booking ID: ");
-        String bookingID = scanner.nextLine();
+        String bookingId = scanner.nextLine();
 
-        bookingRepo.getGuestInfoByBooking(bookingID)
+        bookingRepo.getGuestInfoByBooking(bookingId)
             .forEach(g ->
                     System.out.println(
                         g.firstName() + " " + g.lastName() +
@@ -96,7 +96,11 @@ public class Menu {
     }
 
     public void removeBooking(){
-        //todo: call BookingRepository to remove a booking
+        System.out.print("Booking ID to cancel: ");
+        String bookingId = scanner.nextLine();
+
+        bookingRepo.remove(bookingId);
+        System.out.println("Booking removed.");
     }
 }
 
