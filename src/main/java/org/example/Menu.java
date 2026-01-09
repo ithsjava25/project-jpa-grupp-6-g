@@ -49,7 +49,14 @@ public class Menu {
 
 
     public void printBookings() {
-        //todo: call BookingRepository to get all bookings and print to console
+        bookingRepo.getBookings().forEach(b ->
+            System.out.println(
+                "Booking #" + b.id() +
+                    " | Room: " + b.roomNumber() +
+                    " | " + b.startDate() + " → " + b.endDate() +
+                    " | Price: " + b.totalPrice()
+            )
+        );
     }
 
     public void printBookingsByGuest(){
