@@ -60,7 +60,20 @@ public class Menu {
     }
 
     public void printBookingsByGuest(){
-        //todo: call BookingRepository to get all bookings connected to guest email and print to console
+        System.out.println("Guest email: ");
+        String email = scanner.nextLine();
+
+        // todo: Validate if guest exists
+
+        bookingRepo.getBookingInfoByGuest(email)
+            .forEach(b ->
+                    System.out.println(
+                        "Booking #" + b.id() +
+                        " | Room: " + b.roomNumber() +
+                        " | " + b.startDate() + " → " + b.endDate() +
+                        " | Price: " + b.totalPrice()
+                    )
+                );
     }
 
     public void printGuestsByBooking(){
