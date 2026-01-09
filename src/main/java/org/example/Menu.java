@@ -60,14 +60,14 @@ public class Menu {
     }
 
     public void printBookingsByGuest(){
-        System.out.println("Guest email: ");
+        System.out.print("Guest email: ");
         String email = scanner.nextLine();
 
         // todo: Validate if guest exists
 
         bookingRepo.getBookingInfoByGuest(email)
             .forEach(b ->
-                    System.out.println(
+                    System.out.print(
                         "Booking #" + b.id() +
                         " | Room: " + b.roomNumber() +
                         " | " + b.startDate() + " → " + b.endDate() +
@@ -77,7 +77,16 @@ public class Menu {
     }
 
     public void printGuestsByBooking(){
-        //todo: call BookingRepository to get all guests connected to booking and print to console
+        System.out.print("Booking ID: ");
+        String bookingID = scanner.nextLine();
+
+        bookingRepo.getGuestInfoByBooking(bookingID)
+            .forEach(g ->
+                    System.out.println(
+                        g.firstName() + " " + g.lastName() +
+                        " (" + g.email() + ")"
+                    )
+                );
     }
 
     public void createBooking(){
