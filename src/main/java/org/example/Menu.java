@@ -71,17 +71,32 @@ public class Menu {
         System.out.print("Guest email: ");
         String email = scanner.nextLine();
 
-        // todo: Validate if guest exists
+        // Validate if email is not empty
+        if (email.isEmpty()) {
+            System.out.println("Email cannot be empty");
+            return;
+        }
 
-        bookingRepo.getBookingInfoByGuest(email)
-            .forEach(b ->
-                    System.out.println(
-                        "Booking #" + b.id() +
-                        " | Room: " + b.roomNumber() +
-                        " | " + b.startDate() + " → " + b.endDate() +
-                        " | Price: " + b.totalPrice()
-                    )
-                );
+        // Validate if guest exists
+        if (!guestRepo.guestExist(email)) {
+            System.out.println("No guest found with email: " + email);
+        }
+
+        var bookings = bookingRepo.getBookingInfoByGuest(email);
+
+        // Validate that bookings is not empty
+        if (bookings.isEmpty()) {
+            System.out.println("No bookings found.");
+        }
+
+        bookings.forEach(b ->
+            System.out.println(
+                "Booking #" + b.id() +
+                    " | Room: " + b.roomNumber() +
+                    " | " + b.startDate() + " → " + b.endDate() +
+                    " | Price: " + b.totalPrice()
+            )
+        );
     }
 
     public void printGuestsByBooking(){
