@@ -1,5 +1,10 @@
 package org.example;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 public class Menu {
@@ -67,7 +72,7 @@ public class Menu {
 
         bookingRepo.getBookingInfoByGuest(email)
             .forEach(b ->
-                    System.out.print(
+                    System.out.println(
                         "Booking #" + b.id() +
                         " | Room: " + b.roomNumber() +
                         " | " + b.startDate() + " → " + b.endDate() +
@@ -90,9 +95,40 @@ public class Menu {
     }
 
     public void createBooking(){
-        //todo: enter guest and booking information
-        //todo: check for available rooms and choose room(s)
-        //todo: create booking through BookingRepository
+        try {
+            System.out.print("Start date (YYYY-MM-DD): ");
+            LocalDate start = LocalDate.parse(scanner.nextLine());
+
+            System.out.print("End date (YYYY-MM-DD): ");
+            LocalDate end = LocalDate.parse(scanner.nextLine());
+
+            // todo: Validate that end date is after start date
+
+            System.out.print("Number of guests: ");
+            long guests = Long.parseLong(scanner.nextLine());
+
+            System.out.println("Guest emails (separate with comma): ");
+            List<String> emails = Arrays.stream(scanner.nextLine().split(","))
+                .map(String::trim)
+                .toList();
+
+            // todo: validate and loop through list and create guests if they dont exists
+
+            var rooms = bookingRepo.getEmptyRooms(start, end, guests);
+
+            // todo: validate if no empty rooms exists
+
+            Room room = rooms.get(0);
+            BigDecimal nights = BigDecimal.valueOf(ChronoUnit.DAYS.between(start, end));;
+            BigDecimal totalPrice = BigDecimal.valueOf(100); // todo: calculate total price
+
+            bookingRepo.create(emails, start, end, guests, totalPrice);
+            System.out.println("Booking created.");
+
+
+        } catch(Exception e) {
+            System.out.println("Invalid input.");
+        }
     }
 
     public void removeBooking(){
