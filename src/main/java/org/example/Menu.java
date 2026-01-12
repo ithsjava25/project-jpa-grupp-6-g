@@ -108,19 +108,8 @@ public class Menu {
         System.out.print("Booking ID: ");
         String bookingId = scanner.nextLine();
 
-        // Validate booking id is not empty
-        if (bookingId.isEmpty()) {
-            System.out.println("Booking ID cannot be empty.");
-            return;
-        }
-
-        // Check that booking id is a number
-        try {
-            Long.parseLong(bookingId);
-        } catch (NumberFormatException e) {
-            System.out.println("Booking ID must be a number.");
-            return;
-        }
+        // Validate booking id
+        if (validateBookingId(bookingId)) return;
 
         var guests = bookingRepo.getGuestInfoByBooking(bookingId);
 
@@ -192,19 +181,8 @@ public class Menu {
         System.out.print("Booking ID to cancel: ");
         String bookingId = scanner.nextLine();
 
-        // Validate booking id is not empty
-        if (bookingId.isEmpty()) {
-            System.out.println("Booking ID cannot be empty.");
-            return;
-        }
-
-        // Check that booking id is a number
-        try {
-            Long.parseLong(bookingId);
-        } catch (NumberFormatException e) {
-            System.out.println("Booking ID must be a number.");
-            return;
-        }
+        // Validate booking id
+        if (validateBookingId(bookingId)) return;
 
         try {
             bookingRepo.remove(bookingId);
@@ -212,6 +190,23 @@ public class Menu {
         } catch (Exception e) {
             System.out.println("Error cancelling booking: " + e.getMessage());
         }
+    }
+
+    private static boolean validateBookingId(String bookingId) {
+        // Validate booking id is not empty
+        if (bookingId.isEmpty()) {
+            System.out.println("Booking ID cannot be empty.");
+            return true;
+        }
+
+        // Check that booking id is a number
+        try {
+            Long.parseLong(bookingId);
+        } catch (NumberFormatException e) {
+            System.out.println("Booking ID must be a number.");
+            return true;
+        }
+        return false;
     }
 }
 
