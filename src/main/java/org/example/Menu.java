@@ -1,9 +1,9 @@
 package org.example;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -13,10 +13,12 @@ public class Menu {
 
     private final GuestRepository guestRepo;
     private final BookingRepository bookingRepo;
+    private final BookingService bookingService;
 
-    public Menu(GuestRepository guestRepo, BookingRepository bookingRepo) {
+    public Menu(GuestRepository guestRepo, BookingRepository bookingRepo, BookingService bookingService) {
         this.guestRepo = guestRepo;
         this.bookingRepo = bookingRepo;
+        this.bookingService = bookingService;
     }
 
     public void start() {
@@ -72,7 +74,7 @@ public class Menu {
         );
     }
 
-    public void printBookingsByGuest(){
+    public void printBookingsByGuest() {
         System.out.print("Guest email: ");
         String email = scanner.nextLine();
 
@@ -104,7 +106,7 @@ public class Menu {
         );
     }
 
-    public void printGuestsByBooking(){
+    public void printGuestsByBooking() {
         System.out.print("Booking ID: ");
         String bookingId = scanner.nextLine();
 
@@ -127,13 +129,17 @@ public class Menu {
         );
     }
 
-    public void createBooking(){
-        try {
+    public void createBooking() {
+        LocalDate start;
+        LocalDate end;
+        BigDecimal totalPrice;
+        int guests;
+        do {
             System.out.print("Start date (YYYY-MM-DD): ");
-            LocalDate start = LocalDate.parse(scanner.nextLine());
+            start = LocalDate.parse(scanner.nextLine());
 
             System.out.print("End date (YYYY-MM-DD): ");
-            LocalDate end = LocalDate.parse(scanner.nextLine());
+            end = LocalDate.parse(scanner.nextLine());
 
             // Validate that end date is after start date
             if (!end.isAfter(start)) {
@@ -142,49 +148,56 @@ public class Menu {
             }
 
             System.out.print("Number of guests: ");
-            long guests = Long.parseLong(scanner.nextLine());
+            guests = Integer.parseInt(scanner.nextLine());
+            totalPrice = bookingService.calculateTotalPrice(guests, start, end);
+        } while (totalPrice.signum() != 1);
 
-            // Check that it is at least one guest
-            if (guests < 1) {
-                System.out.println("Must have at least 1 guest.");
-                return;
-            }
-
-            var rooms = bookingRepo.getEmptyRooms(start, end, guests);
-            Room room = rooms.get(0);
-            BigDecimal nights = BigDecimal.valueOf(ChronoUnit.DAYS.between(start, end));
-            BigDecimal totalPrice = BigDecimal.valueOf(100); // todo: calculate total price
-
-
-            System.out.println("Guest emails (separate with comma): ");
-            List<String> emails = Arrays.stream(scanner.nextLine().split(","))
-                .map(String::trim)
-                .toList();
-
-
-
-            // Loop through list and create guests if they don't exist
-            for (String email : emails) {
-                if (!guestRepo.guestExist(email)) {
-                    guestRepo.create("Unknown", "Guest", email);
-                }
-            }
-
-
-            // Validate if no empty rooms exists
-            if (rooms.isEmpty()) {
-                System.out.println("No available rooms.");
-                return;
-            }
-
-            bookingRepo.create(emails, start, end, guests, totalPrice);
-            System.out.println("Booking created.");
-
-
-        } catch(Exception e) {
-            System.out.println("Invalid input.");
+        System.out.println("The total price of the booking is: " + totalPrice.setScale(2, RoundingMode.CEILING));
+        System.out.println("Do you want to continue? (Y/N)");
+        String input = scanner.nextLine().toLowerCase();
+        if (input.equals("n")) {
+            return;
         }
+
+        List<String> emails = new ArrayList<>();
+        String email = "";
+
+        if (!bookingRepo.getEmptyRooms(start, end, guests).isEmpty()) {
+            for (int i = 0; i < guests; i++) {
+                boolean guestExists = false;
+                while (!guestExists) {
+                    // verify not empty
+                    System.out.println("Enter details for guest #" + i + 1);
+                    System.out.print("Email: ");
+                    email = scanner.nextLine().trim().toLowerCase();
+                    if (!email.isEmpty()) {
+                        if (!guestRepo.guestExist(email)) {
+                            System.out.print("First name: ");
+                            String firstName = scanner.nextLine().trim().toLowerCase();
+                            System.out.print("Last name: ");
+                            String lastName = scanner.nextLine().trim().toLowerCase();
+
+                            if (validateGuestNames(firstName, lastName)) {
+                                guestRepo.create(firstName, lastName, email);
+                                guestExists = true;
+                            }
+
+                        } else if (guestRepo.guestExist(email)){
+                            guestExists = true;
+                        }
+                    }
+                }
+                emails.add(email);
+            }
+
+        }
+
+        bookingRepo.create(emails, start, end, guests, totalPrice);
+        System.out.println("Booking created.");
+
     }
+
+
 
     public void removeBooking(){
         System.out.print("Booking ID to cancel: ");
@@ -217,5 +230,12 @@ public class Menu {
         }
         return false;
     }
-}
 
+    private boolean validateGuestNames(String firstName, String lastName){
+        if (firstName.isEmpty() || lastName.isEmpty()) {
+            System.out.println("First and last name can't be blank.");
+            return false;
+        }
+        return true;
+    }
+}

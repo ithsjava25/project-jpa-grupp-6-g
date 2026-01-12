@@ -8,25 +8,26 @@ import java.time.temporal.ChronoUnit;
 
 public class BookingService {
     private EntityManagerFactory emf;
-    private GuestRepository guestRepository;
+    private BookingRepository bookingRepository;
+    private BigDecimal priceClass;
 
-    public BookingService (EntityManagerFactory emf, GuestRepository guestRepository) {
+    public BookingService (EntityManagerFactory emf, BookingRepository bookingRepository) {
         this.emf = emf;
-        this.guestRepository = guestRepository;
+        this.bookingRepository = bookingRepository;
+        priceClass = BigDecimal.valueOf(300);
     }
 
     /**
-     *
-     * @param priceClass default value is 300
+     * Calculates to the total cost of a booking for the specified days and number of guests.
      * @param numberOfGuests How many guests that are staying
-     * @param startDate Starting date
-     * @param endDate Ending date
-     * @return The total price for the room for the selected dates
+     * @param startDate Starting date of booking
+     * @param endDate Ending date of booking
+     * @return BigDecimal The total price for the room for the selected dates
      */
-    public BigDecimal calculateTotalPrice(BigDecimal priceClass, long numberOfGuests, LocalDate startDate, LocalDate endDate){
+    public BigDecimal calculateTotalPrice(int numberOfGuests, LocalDate startDate, LocalDate endDate){
         BigDecimal totalprice = BigDecimal.valueOf(-1);
 
-        if (validateValues(priceClass, numberOfGuests, startDate, endDate)) {
+        if (validateValues(numberOfGuests, startDate, endDate)) {
             long numberOfNights = ChronoUnit.DAYS.between(startDate, endDate);
             totalprice = priceClass.multiply(BigDecimal.valueOf(numberOfGuests)).multiply(BigDecimal.valueOf(numberOfNights));
         }
@@ -34,14 +35,18 @@ public class BookingService {
         return totalprice;
     }
 
-    public boolean validateValues(BigDecimal priceClass, long numberOfGuests, LocalDate startDate, LocalDate endDate) {
-        if (priceClass == null || priceClass.signum() != 1)
+    private boolean validateValues(int numberOfGuests, LocalDate startDate, LocalDate endDate) {
+        if (numberOfGuests < 1) {
+            System.out.println("Number of guests can't be less than 1.");
             return false;
-        else if (numberOfGuests < 1) {
+        } else if (bookingRepository.getMaxGuests() < numberOfGuests) {
+            System.out.println("Number of guests exceeds largest room capacity.");
             return false;
         } else if (startDate.isAfter(endDate) || startDate.isBefore(LocalDate.now())) {
+            System.out.println("Start date must from today and before end date.");
             return false;
-        } else if (endDate.isBefore(startDate) || endDate.isEqual(startDate)) {
+        } else if (endDate.isEqual(startDate)) {
+            System.out.println("End date must be at least one day after start date.");
             return false;
         } else return true;
     }

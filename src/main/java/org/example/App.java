@@ -21,8 +21,9 @@ public class App {
         try (EntityManagerFactory emf = cfg.createEntityManagerFactory()) {
             GuestRepository guest = new GuestRepository(emf);
             BookingRepository booking = new BookingRepository(emf, guest);
+            BookingService bookingService = new BookingService(emf, booking);
 
-            Menu menu = new Menu(guest, booking);
+            Menu menu = new Menu(guest, booking, bookingService);
             menu.start();
 
         }

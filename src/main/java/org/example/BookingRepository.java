@@ -6,6 +6,7 @@ import jakarta.persistence.Query;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public class BookingRepository {
     private final EntityManagerFactory emf;
@@ -16,7 +17,7 @@ public class BookingRepository {
         guestRepository = guest;
     }
 
-    public List<Room> getEmptyRooms(LocalDate start, LocalDate end, long guests) {
+    public List<Room> getEmptyRooms(LocalDate start, LocalDate end, int guests) {
         return emf.callInTransaction(em ->
             em.createQuery("""
             select r
@@ -100,7 +101,7 @@ public class BookingRepository {
         });
     }
 
-    public boolean create(List<String> emailList, LocalDate startDate, LocalDate endDate, long numberOfGuests, BigDecimal totalPrice){
+    public boolean create(List<String> emailList, LocalDate startDate, LocalDate endDate, int numberOfGuests, BigDecimal totalPrice){
         return emf.callInTransaction(em -> {
             Room room = getEmptyRooms(startDate, endDate, numberOfGuests).getFirst();
 
@@ -137,6 +138,18 @@ public class BookingRepository {
                 .executeUpdate();
             return true;
         });
+    }
+
+    public int getMaxGuests(){
+        return emf.callInTransaction(em ->
+            Optional.ofNullable(
+                em.createQuery("""
+                select max(r.roomCapacity)
+                from Room r
+            """, Integer.class)
+                    .getSingleResult()
+            ).orElse(0)
+        );
     }
 
     record BookingInfo(long id, String roomNumber, LocalDate startDate, LocalDate endDate, BigDecimal totalPrice){ }
