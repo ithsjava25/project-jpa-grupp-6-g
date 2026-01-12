@@ -192,8 +192,26 @@ public class Menu {
         System.out.print("Booking ID to cancel: ");
         String bookingId = scanner.nextLine();
 
-        bookingRepo.remove(bookingId);
-        System.out.println("Booking removed.");
+        // Validate booking id is not empty
+        if (bookingId.isEmpty()) {
+            System.out.println("Booking ID cannot be empty.");
+            return;
+        }
+
+        // Check that booking id is a number
+        try {
+            Long.parseLong(bookingId);
+        } catch (NumberFormatException e) {
+            System.out.println("Booking ID must be a number.");
+            return;
+        }
+
+        try {
+            bookingRepo.remove(bookingId);
+            System.out.println("Booking cancelled.");
+        } catch (Exception e) {
+            System.out.println("Error cancelling booking: " + e.getMessage());
+        }
     }
 }
 
