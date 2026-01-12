@@ -55,9 +55,14 @@ public class Menu {
 
     public void printBookings() {
 
-        // todo: if no bookings?
+        var bookings = bookingRepo.getBookings();
 
-        bookingRepo.getBookings().forEach(b ->
+        // Validate that bookings is not empty
+        if (bookings.isEmpty()) {
+            System.out.println("No bookings found.");
+        }
+
+        bookings.forEach(b ->
             System.out.println(
                 "Booking #" + b.id() +
                     " | Room: " + b.roomNumber() +
