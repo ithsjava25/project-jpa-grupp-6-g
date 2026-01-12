@@ -144,10 +144,24 @@ public class Menu {
             System.out.print("Number of guests: ");
             long guests = Long.parseLong(scanner.nextLine());
 
+            // Check that it is at least one guest
+            if (guests < 1) {
+                System.out.println("Must have at least 1 guest.");
+                return;
+            }
+
+            var rooms = bookingRepo.getEmptyRooms(start, end, guests);
+            Room room = rooms.get(0);
+            BigDecimal nights = BigDecimal.valueOf(ChronoUnit.DAYS.between(start, end));
+            BigDecimal totalPrice = BigDecimal.valueOf(100); // todo: calculate total price
+
+
             System.out.println("Guest emails (separate with comma): ");
             List<String> emails = Arrays.stream(scanner.nextLine().split(","))
                 .map(String::trim)
                 .toList();
+
+
 
             // Loop through list and create guests if they don't exist
             for (String email : emails) {
@@ -156,17 +170,12 @@ public class Menu {
                 }
             }
 
-            var rooms = bookingRepo.getEmptyRooms(start, end, guests);
 
             // Validate if no empty rooms exists
             if (rooms.isEmpty()) {
                 System.out.println("No available rooms.");
                 return;
             }
-
-            Room room = rooms.get(0);
-            BigDecimal nights = BigDecimal.valueOf(ChronoUnit.DAYS.between(start, end));
-            BigDecimal totalPrice = BigDecimal.valueOf(100); // todo: calculate total price
 
             bookingRepo.create(emails, start, end, guests, totalPrice);
             System.out.println("Booking created.");
