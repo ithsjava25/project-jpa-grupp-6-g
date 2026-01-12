@@ -54,6 +54,9 @@ public class Menu {
 
 
     public void printBookings() {
+
+        // todo: if no bookings?
+
         bookingRepo.getBookings().forEach(b ->
             System.out.println(
                 "Booking #" + b.id() +
@@ -102,7 +105,11 @@ public class Menu {
             System.out.print("End date (YYYY-MM-DD): ");
             LocalDate end = LocalDate.parse(scanner.nextLine());
 
-            // todo: Validate that end date is after start date
+            // Validate that end date is after start date
+            if (!end.isAfter(start)) {
+                System.out.println("End date must be after start date.");
+                return;
+            }
 
             System.out.print("Number of guests: ");
             long guests = Long.parseLong(scanner.nextLine());
@@ -112,11 +119,20 @@ public class Menu {
                 .map(String::trim)
                 .toList();
 
-            // todo: validate and loop through list and create guests if they dont exists
+            // Loop through list and create guests if they don't exist
+            for (String email : emails) {
+                if (!guestRepo.guestExist(email)) {
+                    guestRepo.create("Unknown", "Guest", email);
+                }
+            }
 
             var rooms = bookingRepo.getEmptyRooms(start, end, guests);
 
-            // todo: validate if no empty rooms exists
+            // Validate if no empty rooms exists
+            if (rooms.isEmpty()) {
+                System.out.println("No available rooms.");
+                return;
+            }
 
             Room room = rooms.get(0);
             BigDecimal nights = BigDecimal.valueOf(ChronoUnit.DAYS.between(start, end));;
