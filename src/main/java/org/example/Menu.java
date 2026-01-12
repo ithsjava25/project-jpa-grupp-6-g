@@ -108,13 +108,34 @@ public class Menu {
         System.out.print("Booking ID: ");
         String bookingId = scanner.nextLine();
 
-        bookingRepo.getGuestInfoByBooking(bookingId)
-            .forEach(g ->
-                    System.out.println(
-                        g.firstName() + " " + g.lastName() +
-                        " (" + g.email() + ")"
-                    )
-                );
+        // Validate booking id is not empty
+        if (bookingId.isEmpty()) {
+            System.out.println("Booking ID cannot be empty.");
+            return;
+        }
+
+        // Check that booking id is a number
+        try {
+            Long.parseLong(bookingId);
+        } catch (NumberFormatException e) {
+            System.out.println("Booking ID must be a number.");
+            return;
+        }
+
+        var guests = bookingRepo.getGuestInfoByBooking(bookingId);
+
+        // Check if bookings exists with booking id
+        if (guests.isEmpty()) {
+            System.out.println("No guests found for this booking or booking does not exist.");
+            return;
+        }
+
+        guests.forEach(g ->
+            System.out.println(
+                g.firstName() + " " + g.lastName() +
+                    " (" + g.email() + ")"
+            )
+        );
     }
 
     public void createBooking(){
@@ -155,7 +176,7 @@ public class Menu {
             }
 
             Room room = rooms.get(0);
-            BigDecimal nights = BigDecimal.valueOf(ChronoUnit.DAYS.between(start, end));;
+            BigDecimal nights = BigDecimal.valueOf(ChronoUnit.DAYS.between(start, end));
             BigDecimal totalPrice = BigDecimal.valueOf(100); // todo: calculate total price
 
             bookingRepo.create(emails, start, end, guests, totalPrice);
