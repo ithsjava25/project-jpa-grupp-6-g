@@ -62,6 +62,7 @@ public class Menu {
         // Validate that bookings is not empty
         if (bookings.isEmpty()) {
             System.out.println("No bookings found.");
+            return;
         }
 
         bookings.forEach(b ->
@@ -178,7 +179,7 @@ public class Menu {
                             System.out.print("Last name: ");
                             String lastName = scanner.nextLine().trim().toLowerCase();
 
-                            if (validGuestNames(firstName, lastName)) {
+                            if (isValidGuestNames(firstName, lastName)) {
                                 guestRepo.create(firstName, lastName, email);
                                 guestExists = true;
                             }
@@ -236,7 +237,7 @@ public class Menu {
         return false;
     }
 
-    private boolean validGuestNames(String firstName, String lastName){
+    private boolean isValidGuestNames(String firstName, String lastName){
         if (firstName.isEmpty() || lastName.isEmpty()) {
             System.out.println("First and last name can't be blank.");
             return false;
