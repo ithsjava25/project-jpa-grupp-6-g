@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class Menu {
@@ -137,7 +138,7 @@ public class Menu {
     public void createBooking() {
         LocalDate start = null;
         LocalDate end = null;
-        BigDecimal totalPrice;
+        BigDecimal totalPrice = null;
         int guests = INVALID;
         do {
             try {
@@ -160,7 +161,7 @@ public class Menu {
             }
 
             totalPrice = bookingService.calculateTotalPrice(guests, start, end);
-        } while (totalPrice.signum() != 1);
+        } while (Objects.requireNonNull(totalPrice).signum() != 1);
 
         System.out.println("The total price of the booking is: " + totalPrice.setScale(2, RoundingMode.HALF_UP));
         System.out.println("Do you want to continue? (Y/N)");
