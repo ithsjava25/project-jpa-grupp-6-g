@@ -15,7 +15,7 @@ public class Menu {
     private final GuestRepository guestRepo;
     private final BookingRepository bookingRepo;
     private final BookingService bookingService;
-    public static final int INVALID = -1;
+    private static final int INVALID = -1;
 
     public Menu(GuestRepository guestRepo, BookingRepository bookingRepo, BookingService bookingService) {
         this.guestRepo = guestRepo;
