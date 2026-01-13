@@ -166,7 +166,7 @@ public class Menu {
         System.out.println("The total price of the booking is: " + totalPrice.setScale(2, RoundingMode.HALF_UP));
         System.out.println("Do you want to continue? (Y/N)");
         String input = scanner.nextLine().toLowerCase();
-        if (input.equals("n")) {
+        if (!input.equals("y")) {
             System.out.println("Booking cancelled.");
             return;
         }

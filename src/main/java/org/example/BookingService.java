@@ -30,12 +30,15 @@ public class BookingService {
         if (validateValues(numberOfGuests, startDate, endDate)) {
             long numberOfNights = ChronoUnit.DAYS.between(startDate, endDate);
             totalprice = priceClass.multiply(BigDecimal.valueOf(numberOfGuests)).multiply(BigDecimal.valueOf(numberOfNights));
+            if (totalprice.signum() != 1)
+                throw new RuntimeException("Critical error in hotel pricing logic, unrecoverable");
         }
 
         return totalprice;
     }
 
     private boolean validateValues(int numberOfGuests, LocalDate startDate, LocalDate endDate) {
+
         if (numberOfGuests < 1) {
             System.out.println("Number of guests can't be less than 1.");
             return false;
