@@ -190,10 +190,12 @@ public class Menu {
                 emails.add(email);
             }
 
-        }
 
         bookingRepo.create(emails, start, end, guests, totalPrice);
         System.out.println("Booking created.");
+        } else {
+            System.out.println("No rooms available for the selected dates and guest count.");
+        }
 
     }
 
