@@ -112,7 +112,7 @@ public class Menu {
         String bookingId = scanner.nextLine();
 
         // Validate booking id
-        if (validateBookingId(bookingId)) return;
+        if (isInvalidBookingId(bookingId)) return;
 
         var guests = bookingRepo.getGuestInfoByBooking(bookingId);
 
@@ -178,7 +178,7 @@ public class Menu {
                             System.out.print("Last name: ");
                             String lastName = scanner.nextLine().trim().toLowerCase();
 
-                            if (validateGuestNames(firstName, lastName)) {
+                            if (validGuestNames(firstName, lastName)) {
                                 guestRepo.create(firstName, lastName, email);
                                 guestExists = true;
                             }
@@ -209,7 +209,7 @@ public class Menu {
         String bookingId = scanner.nextLine();
 
         // Validate booking id
-        if (validateBookingId(bookingId)) return;
+        if (isInvalidBookingId(bookingId)) return;
 
         try {
             bookingRepo.remove(bookingId);
@@ -219,7 +219,7 @@ public class Menu {
         }
     }
 
-    private static boolean validateBookingId(String bookingId) {
+    private static boolean isInvalidBookingId(String bookingId) {
         // Validate booking id is not empty
         if (bookingId.isEmpty()) {
             System.out.println("Booking ID cannot be empty.");
@@ -236,7 +236,7 @@ public class Menu {
         return false;
     }
 
-    private boolean validateGuestNames(String firstName, String lastName){
+    private boolean validGuestNames(String firstName, String lastName){
         if (firstName.isEmpty() || lastName.isEmpty()) {
             System.out.println("First and last name can't be blank.");
             return false;
