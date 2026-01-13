@@ -3,6 +3,7 @@ package org.example;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -14,6 +15,7 @@ public class Menu {
     private final GuestRepository guestRepo;
     private final BookingRepository bookingRepo;
     private final BookingService bookingService;
+    public static final int INVALID = -1;
 
     public Menu(GuestRepository guestRepo, BookingRepository bookingRepo, BookingService bookingService) {
         this.guestRepo = guestRepo;
@@ -133,25 +135,24 @@ public class Menu {
     }
 
     public void createBooking() {
-        LocalDate start;
-        LocalDate end;
+        LocalDate start = null;
+        LocalDate end = null;
         BigDecimal totalPrice;
-        int guests;
+        int guests = INVALID;
         do {
-            System.out.print("Start date (YYYY-MM-DD): ");
-            start = LocalDate.parse(scanner.nextLine());
+            try {
+                System.out.print("Start date (YYYY-MM-DD): ");
+                start = LocalDate.parse(scanner.nextLine());
 
-            System.out.print("End date (YYYY-MM-DD): ");
-            end = LocalDate.parse(scanner.nextLine());
+                System.out.print("End date (YYYY-MM-DD): ");
+                end = LocalDate.parse(scanner.nextLine());
 
-            // Validate that end date is after start date
-            if (!end.isAfter(start)) {
-                System.out.println("End date must be after start date.");
-                return;
+                System.out.print("Number of guests: ");
+                guests = Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException | DateTimeParseException e) {
+                System.out.println("Invalid Date format/Number of guests needs to be a whole number.");
             }
 
-            System.out.print("Number of guests: ");
-            guests = Integer.parseInt(scanner.nextLine());
             totalPrice = bookingService.calculateTotalPrice(guests, start, end);
         } while (totalPrice.signum() != 1);
 
@@ -185,7 +186,7 @@ public class Menu {
                                 guestExists = true;
                             }
 
-                        } else if (guestRepo.guestExist(email)){
+                        } else{
                             guestExists = true;
                         }
                     }
@@ -193,10 +194,8 @@ public class Menu {
                 emails.add(email);
             }
 
-            if (!email.isEmpty()) {
-                bookingRepo.create(emails, start, end, guests, totalPrice);
-                System.out.println("Booking created.");
-            }
+            bookingRepo.create(emails, start, end, guests, totalPrice);
+            System.out.println("Booking created.");
 
         } else {
             System.out.println("No rooms available for the selected dates and guest count.");
