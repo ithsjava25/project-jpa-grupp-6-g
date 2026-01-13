@@ -167,6 +167,7 @@ public class Menu {
         System.out.println("Do you want to continue? (Y/N)");
         String input = scanner.nextLine().toLowerCase();
         if (input.equals("n")) {
+            System.out.println("Booking cancelled.");
             return;
         }
 
