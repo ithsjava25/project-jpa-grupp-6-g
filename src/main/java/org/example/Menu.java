@@ -167,7 +167,7 @@ public class Menu {
                 boolean guestExists = false;
                 while (!guestExists) {
                     // verify not empty
-                    System.out.println("Enter details for guest #" + i + 1);
+                    System.out.println("Enter details for guest #" + (i + 1));
                     System.out.print("Email: ");
                     email = scanner.nextLine().trim().toLowerCase();
                     if (!email.isEmpty()) {
