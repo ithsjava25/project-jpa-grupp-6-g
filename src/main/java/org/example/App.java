@@ -6,7 +6,7 @@ import org.hibernate.jpa.HibernatePersistenceConfiguration;
 
 
 public class App {
-    static void main(String[] args) {
+    static void main() {
 
         final PersistenceConfiguration cfg = new HibernatePersistenceConfiguration("emf")
             .jdbcUrl("jdbc:mysql://localhost:3306/booking_db")
@@ -21,7 +21,7 @@ public class App {
         try (EntityManagerFactory emf = cfg.createEntityManagerFactory()) {
             GuestRepository guest = new GuestRepository(emf);
             BookingRepository booking = new BookingRepository(emf, guest);
-            BookingService bookingService = new BookingService(emf, booking);
+            BookingService bookingService = new BookingService(booking);
 
             Menu menu = new Menu(guest, booking, bookingService);
             menu.start();
