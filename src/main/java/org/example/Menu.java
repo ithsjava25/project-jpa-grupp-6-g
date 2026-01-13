@@ -138,7 +138,7 @@ public class Menu {
     public void createBooking() {
         LocalDate start = null;
         LocalDate end = null;
-        BigDecimal totalPrice = null;
+        BigDecimal totalPrice = BigDecimal.valueOf(-1);
         int guests = INVALID;
         do {
             try {
@@ -161,7 +161,7 @@ public class Menu {
             }
 
             totalPrice = bookingService.calculateTotalPrice(guests, start, end);
-        } while (Objects.requireNonNull(totalPrice).signum() != 1);
+        } while (totalPrice.signum() != 1);
 
         System.out.println("The total price of the booking is: " + totalPrice.setScale(2, RoundingMode.HALF_UP));
         System.out.println("Do you want to continue? (Y/N)");

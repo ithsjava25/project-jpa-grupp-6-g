@@ -46,7 +46,7 @@ public class BookingService {
             System.out.println("Number of guests exceeds largest room capacity.");
             return false;
         } else if (startDate.isAfter(endDate) || startDate.isBefore(LocalDate.now())) {
-            System.out.println("Start date must from today and before end date.");
+            System.out.println("Start date must be from today and before end date.");
             return false;
         } else if (endDate.isEqual(startDate)) {
             System.out.println("End date must be at least one day after start date.");
