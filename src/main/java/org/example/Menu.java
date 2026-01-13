@@ -87,6 +87,7 @@ public class Menu {
         // Validate if guest exists
         if (!guestRepo.guestExist(email)) {
             System.out.println("No guest found with email: " + email);
+            return;
         }
 
         var bookings = bookingRepo.getBookingInfoByGuest(email);
