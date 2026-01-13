@@ -153,10 +153,15 @@ public class Menu {
                 System.out.println("Invalid Date format/Number of guests needs to be a whole number.");
             }
 
+            if (bookingRepo.getEmptyRooms(start, end, guests).isEmpty()) {
+                System.out.println("No rooms available for the selected dates and guest count.");
+                return;
+            }
+
             totalPrice = bookingService.calculateTotalPrice(guests, start, end);
         } while (totalPrice.signum() != 1);
 
-        System.out.println("The total price of the booking is: " + totalPrice.setScale(2, RoundingMode.CEILING));
+        System.out.println("The total price of the booking is: " + totalPrice.setScale(2, RoundingMode.HALF_UP));
         System.out.println("Do you want to continue? (Y/N)");
         String input = scanner.nextLine().toLowerCase();
         if (input.equals("n")) {
@@ -197,10 +202,7 @@ public class Menu {
             bookingRepo.create(emails, start, end, guests, totalPrice);
             System.out.println("Booking created.");
 
-        } else {
-            System.out.println("No rooms available for the selected dates and guest count.");
         }
-
     }
 
 
