@@ -96,6 +96,7 @@ public class Menu {
         // Validate that bookings is not empty
         if (bookings.isEmpty()) {
             System.out.println("No bookings found.");
+            return;
         }
 
         bookings.forEach(b ->
