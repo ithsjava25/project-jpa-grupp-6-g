@@ -151,6 +151,7 @@ public class Menu {
                 guests = Integer.parseInt(scanner.nextLine());
             } catch (NumberFormatException | DateTimeParseException e) {
                 System.out.println("Invalid Date format/Number of guests needs to be a whole number.");
+                continue;
             }
 
             if (bookingRepo.getEmptyRooms(start, end, guests).isEmpty()) {
