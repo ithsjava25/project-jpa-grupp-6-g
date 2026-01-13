@@ -1,9 +1,7 @@
 package org.example;
 
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.NoResultException;
-import jakarta.persistence.TypedQuery;
 
 public class GuestRepository {
     private EntityManagerFactory emf;
@@ -14,51 +12,35 @@ public class GuestRepository {
 
     // Find guest in Guest table based on email
     public Guest get(String email) {
-        EntityManager em = emf.createEntityManager();
         try {
-            TypedQuery<Guest> query = em.createQuery(
-                "select g from Guest g where g.email = :email",
-                Guest.class
+            return emf.callInTransaction(em ->
+                em.createQuery("select g from Guest g where g.email = :email", Guest.class)
+                    .setParameter("email", email)
+                    .getSingleResult()
             );
-           query.setParameter("email", email);
-           return query.getSingleResult();
         } catch (NoResultException e) {
             return null;
-        } finally {
-            em.close();
         }
     }
+
 
     // Create a new Guest in Guest table
     public void create(String firstName, String lastName, String email) {
-        if (guestExist(email)){
+        if (guestExist(email)) {
             return;
         }
 
-        Guest guest = new Guest();
-        guest.setFirstName(firstName);
-        guest.setLastName(lastName);
-        guest.setEmail(email);
-
-        EntityManager em = emf.createEntityManager();
-        try {
-            em.getTransaction().begin();
+        emf.runInTransaction(em -> {
+            Guest guest = new Guest();
+            guest.setFirstName(firstName);
+            guest.setLastName(lastName);
+            guest.setEmail(email);
             em.persist(guest);
-            em.getTransaction().commit();
-
-        } catch (Exception e ) {
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            throw e;
-
-        } finally {
-            em.close();
-        }
+        });
     }
 
     // Returns true if guest exists in database
-    public boolean guestExist(String email){
+    public boolean guestExist(String email) {
         Guest existingGuest = get(email);
         return existingGuest != null;
     }
