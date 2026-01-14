@@ -11,7 +11,7 @@ import jakarta.persistence.NoResultException;
  * based on their email address.
  */
 public class GuestRepository {
-    private EntityManagerFactory emf;
+    private final EntityManagerFactory emf;
 
     public GuestRepository(EntityManagerFactory emf) {
         this.emf = emf;
