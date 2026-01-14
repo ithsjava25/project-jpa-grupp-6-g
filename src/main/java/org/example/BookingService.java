@@ -1,20 +1,23 @@
 package org.example;
 
-import jakarta.persistence.EntityManagerFactory;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
 public class BookingService {
-    private EntityManagerFactory emf;
-    private BookingRepository bookingRepository;
-    private BigDecimal priceClass;
+    private final BookingRepository bookingRepository;
+    private final BigDecimal priceClass;
+    private boolean testMode = false;
 
-    public BookingService (EntityManagerFactory emf, BookingRepository bookingRepository) {
-        this.emf = emf;
+    public BookingService(BookingRepository bookingRepository) {
         this.bookingRepository = bookingRepository;
         priceClass = BigDecimal.valueOf(300);
+    }
+    public BookingService(BigDecimal priceClass) {
+        bookingRepository = null;
+        this.priceClass = priceClass;
+        testMode = true;
     }
 
     /**
@@ -31,26 +34,29 @@ public class BookingService {
             long numberOfNights = ChronoUnit.DAYS.between(startDate, endDate);
             totalprice = priceClass.multiply(BigDecimal.valueOf(numberOfGuests)).multiply(BigDecimal.valueOf(numberOfNights));
             if (totalprice.signum() != 1)
-                throw new RuntimeException("Critical error in hotel pricing logic, unrecoverable");
+                throw new RuntimeException("Critical error in hotel pricing logic, unrecoverable state contact support");
         }
 
         return totalprice;
     }
 
     private boolean validateValues(int numberOfGuests, LocalDate startDate, LocalDate endDate) {
+        if (!testMode) {
+            if (bookingRepository.getMaxGuests() < numberOfGuests) {
+                System.out.println("Number of guests exceeds largest room capacity.");
+                return false;
+            }
+        }
 
         if (numberOfGuests < 1) {
-            System.out.println("Number of guests can't be less than 1.");
-            return false;
-        } else if (bookingRepository.getMaxGuests() < numberOfGuests) {
-            System.out.println("Number of guests exceeds largest room capacity.");
-            return false;
-        } else if (startDate.isAfter(endDate) || startDate.isBefore(LocalDate.now())) {
-            System.out.println("Start date must be from today and before end date.");
-            return false;
-        } else if (endDate.isEqual(startDate)) {
-            System.out.println("End date must be at least one day after start date.");
-            return false;
-        } else return true;
+                System.out.println("Number of guests can't be less than 1.");
+                return false;
+            } else if (startDate.isAfter(endDate) || startDate.isBefore(LocalDate.now())) {
+                System.out.println("Start date must be from today and before end date.");
+                return false;
+            } else if (endDate.isEqual(startDate)) {
+                System.out.println("End date must be at least one day after start date.");
+                return false;
+            } else return true;
+        }
     }
-}
