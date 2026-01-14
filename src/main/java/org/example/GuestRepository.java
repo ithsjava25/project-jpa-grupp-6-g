@@ -1,8 +1,6 @@
 package org.example;
 
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.NoResultException;
-
 
 /**
  * Repository class responsible for database operations related to {@link Guest}.
@@ -25,17 +23,14 @@ public class GuestRepository {
      *         with the given email
      */
     public Guest get(String email) {
-        try {
-            return emf.callInTransaction(em ->
-                em.createQuery("select g from Guest g where g.email = :email", Guest.class)
-                    .setParameter("email", email)
-                    .getSingleResult()
-            );
-        } catch (NoResultException e) {
-            return null;
-        }
+        return emf.callInTransaction(em ->
+            em.createQuery("select g from Guest g where g.email = :email", Guest.class)
+                .setParameter("email", email)
+                .getResultStream()
+                .findFirst()
+                .orElse(null)
+                );
     }
-
 
     /**
      * Creates and persists a new guest in the database.
