@@ -47,8 +47,8 @@ class BookingServiceTest {
     @Test
     void calculateTotalPriceShouldReturnNegativeValueIfStartDateIsBeforeEndDate(){
         var guests = 1;
-        var start = LocalDate.now();
-        var end = LocalDate.now().minusDays(1);
+        var start = LocalDate.now().plusDays(1);
+        var end = LocalDate.now();
         var bookingService = new BookingService(BigDecimal.ONE);
 
         var result = bookingService.calculateTotalPrice(guests, start, end);
