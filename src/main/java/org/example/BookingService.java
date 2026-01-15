@@ -40,6 +40,13 @@ public class BookingService {
         return totalprice;
     }
 
+    /**
+     * Methods takes params and checks them for when input is invalid for booking logic
+     * @param numberOfGuests Number of guests in the booking
+     * @param startDate Starting date for the booking
+     * @param endDate Ending date for the booking
+     * @return Returns true when none of the params are breaking booking logic, otherwise returns false.
+     */
     private boolean validateValues(int numberOfGuests, LocalDate startDate, LocalDate endDate) {
         if (!testMode) {
             if (bookingRepository.getMaxGuests() < numberOfGuests) {

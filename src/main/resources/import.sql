@@ -1,8 +1,8 @@
-insert into Hotel (name)
-values ('Real Hotel');
+replace into Hotel (name)
+values ('Hotel California');
 
 
-insert into Room (priceClass, roomCapacity, roomNumber, hotel_id)
+replace into Room (priceClass, roomCapacity, roomNumber, hotel_id)
 values (300, 2, 1, 1),
        (300, 2, 2, 1),
        (300, 2, 3, 1),
@@ -17,5 +17,4 @@ values (300, 2, 1, 1),
        (300, 4, 12, 1),
        (300, 4, 13, 1),
        (300, 4, 14, 1);
-
 
