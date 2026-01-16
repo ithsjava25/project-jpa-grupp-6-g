@@ -72,7 +72,7 @@ public class Menu {
 
     /**
      * Displays all the bookings in the system.
-     * If no bookings exist, displays and appropriate message.
+     * If no bookings exist, displays an appropriate message.
      */
     public void printBookings() {
 
@@ -96,7 +96,7 @@ public class Menu {
 
     /**
      * Displays all bookings associated with a specific guest.
-     * Prompts for the guests email address and validates that the guest exists
+     * Prompts for the guest's email address and validates that the guest exists
      * before displaying their bookings.
      */
     public void printBookingsByGuest() {
@@ -286,10 +286,10 @@ public class Menu {
     }
 
     /**
-     * Validates if the inputs for first name and last name aren't null.
+     * Validates that the first name and last name are not empty.
      * @param firstName A string with the first name input.
      * @param lastName A string with the last name input.
-     * @return Returns false if either parameter is null otherwise true.
+     * @return Returns false if either parameter is empty, otherwise true.
      */
     private boolean isValidGuestNames(String firstName, String lastName){
         if (firstName.isEmpty() || lastName.isEmpty()) {

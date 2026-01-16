@@ -85,8 +85,8 @@ public class BookingRepository {
 
     /**
      * Method to convert Guest Objects into GuestInfo Objects to make output easier
-     * @param bookingId bookingId for the room you want.
-     * @return Returns a List of BookingInfo.
+     * @param bookingId The ID of the booking to fetch guest info for.
+     * @return Returns a List of GuestInfo records.
      */
     public List<GuestInfo> getGuestInfoByBooking(String bookingId){
         return getGuestsByBooking(bookingId).stream()
