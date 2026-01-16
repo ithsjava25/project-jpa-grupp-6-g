@@ -41,7 +41,7 @@ public class BookingService {
     }
 
     /**
-     * Methods takes params and checks them for when input is invalid for booking logic
+     * Method takes params and checks them for when input is invalid for booking logic
      * @param numberOfGuests Number of guests in the booking
      * @param startDate Starting date for the booking
      * @param endDate Ending date for the booking
