@@ -6,9 +6,17 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Scanner;
 
+/**
+ * Command-line interface for the booking system.
+ * Provides a menu-driven interface for users to:
+ *   Create new bookings
+ *   View existing bookings
+ *   Search bookings by guest
+ *   View guests associated with a booking
+ *   Cancel bookings
+ */
 public class Menu {
 
     private final Scanner scanner = new Scanner(System.in);
@@ -24,6 +32,10 @@ public class Menu {
         this.bookingService = bookingService;
     }
 
+    /**
+     * Starts the main menu loop.
+     * Displays the menu and processes user input until the user chooses to exit.
+     */
     public void start() {
         while (true) {
             try {
@@ -58,6 +70,10 @@ public class Menu {
     }
 
 
+    /**
+     * Displays all the bookings in the system.
+     * If no bookings exist, displays an appropriate message.
+     */
     public void printBookings() {
 
         var bookings = bookingRepo.getBookings();
@@ -78,6 +94,11 @@ public class Menu {
         );
     }
 
+    /**
+     * Displays all bookings associated with a specific guest.
+     * Prompts for the guest's email address and validates that the guest exists
+     * before displaying their bookings.
+     */
     public void printBookingsByGuest() {
         System.out.print("Guest email: ");
         String email = scanner.nextLine();
@@ -112,6 +133,10 @@ public class Menu {
         );
     }
 
+    /**
+     * Displays all guests associated with a specific booking.
+     * Prompts for the booking ID and validates it before displaying the guest list.
+     */
     public void printGuestsByBooking() {
         System.out.print("Booking ID: ");
         String bookingId = scanner.nextLine();
@@ -135,6 +160,14 @@ public class Menu {
         );
     }
 
+    /**
+     * Creates a new booking through an interactive process.
+     * - Collecting booking dates and guest count.
+     * - Validating input and checking room availability.
+     * - Calculating and displaying the total price.
+     * - Collecting guest information (creating new guests if needed).
+     * - Saving the booking to the database.
+     */
     public void createBooking() {
         LocalDate start = null;
         LocalDate end = null;
@@ -209,7 +242,11 @@ public class Menu {
     }
 
 
-
+    /**
+     * Cancels an existing booking.
+     * Prompts for the booking ID, validates it, and deletes the booking
+     * along with all associated guest relationships.
+     */
     public void removeBooking(){
         System.out.print("Booking ID to cancel: ");
         String bookingId = scanner.nextLine();
@@ -225,6 +262,12 @@ public class Menu {
         }
     }
 
+    /**
+     * Validates a booking ID string.
+     * Checks that the ID is not empty and can be parsed as a long integer.
+     * @param bookingId the booking ID to validate.
+     * @return true if the booking ID is invalid, false if valid.
+     */
     private static boolean isInvalidBookingId(String bookingId) {
         // Validate booking id is not empty
         if (bookingId.isEmpty()) {
@@ -242,6 +285,12 @@ public class Menu {
         return false;
     }
 
+    /**
+     * Validates that the first name and last name are not empty.
+     * @param firstName A string with the first name input.
+     * @param lastName A string with the last name input.
+     * @return Returns false if either parameter is empty, otherwise true.
+     */
     private boolean isValidGuestNames(String firstName, String lastName){
         if (firstName.isEmpty() || lastName.isEmpty()) {
             System.out.println("First and last name can't be blank.");

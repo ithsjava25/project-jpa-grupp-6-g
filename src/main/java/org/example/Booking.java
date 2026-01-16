@@ -13,15 +13,12 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    //todo: what room you booked in
     @ManyToOne
     @JoinColumn(name = "room_id")
     private Room bookedRoom;
 
-    //todo: not null, needs to be in future
     private LocalDate startDate;
 
-    //todo: not null, needs to be start date +1 or more
     private LocalDate endDate;
 
     private BigDecimal totalPrice;
@@ -33,8 +30,6 @@ public class Booking {
         inverseJoinColumns = @JoinColumn(name = "guest_id")
     )
     Set<Guest> guestBookings;
-
-    //todo: calculate total price by base price * guests * nightsSpent (weekday/end) (Adult/Child)
 
     public long getId() {
         return id;

@@ -22,12 +22,6 @@ public class Hotel {
     @OneToMany (mappedBy = "hotel", cascade = CascadeType.PERSIST)
     private List<Room> rooms = new ArrayList<>();
 
-    //todo: implement method to add rooms to hotel
-    public void addRoom(){}
-
-    //todo: implement method to remove rooms form hotel
-    public void removeRoom(){}
-
     public List<Room> getRooms() {
         return rooms;
     }
